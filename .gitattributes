@@ -1,0 +1,2 @@
+# The dashboard is a byte-exact artifact. No line ending rewriting.
+*.html -text

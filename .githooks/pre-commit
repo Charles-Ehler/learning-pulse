@@ -1,0 +1,20 @@
+#!/bin/sh
+# Refuse to commit a dashboard whose responses are not encrypted.
+#
+# This repository is public and git history is permanent, so an unlocked
+# index.html pushed once cannot be taken back by deleting it afterwards. The
+# check is deliberately dumb: if the file carries a data payload at all, that
+# payload has to say it is locked.
+
+f=index.html
+[ -f "$f" ] || exit 0
+grep -q 'id="nz-seed"' "$f" || exit 0          # blank app, nothing to protect
+
+if ! grep -q '"locked":true' "$f"; then
+  echo "BLOCKED: index.html holds survey responses that are NOT encrypted."
+  echo ""
+  echo "Re-save it from the dashboard with a passphrase set, then commit again."
+  echo "Pushing this file would put every free-text answer at a public address,"
+  echo "permanently, because git history cannot be rewritten away once cloned."
+  exit 1
+fi
